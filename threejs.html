@@ -40,9 +40,9 @@ function fillScene() {
 	var light2 = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
 	light2.position.set( -500, 250, -200 );
 
-	scene.add(ambientLight);
-	scene.add(light);
-	scene.add(light2);
+	// scene.add(ambientLight);
+	// scene.add(light);
+	// scene.add(light2);
 
 
 	var urls = [
@@ -92,7 +92,7 @@ function fillScene() {
 	var petal = new THREE.Object3D();
 	petal.add( cylinder );
 
-	flygplan.add( petal );
+	flygplan.add( petal);
 	flygplan.add(cube);
 
 	flygplan.position.y = 150;
@@ -102,13 +102,14 @@ function fillScene() {
 
 
 
+
+
 }
 
 
 function init() {
 	var canvasWidth = window.innerWidth;
 	var canvasHeight = window.innerHeight;
-
 
 	var canvasRatio = canvasWidth / canvasHeight;
 

@@ -1,7 +1,11 @@
 <html>
 <head>
     <title>Meh</title>
-    <style>canvas { width: 100%; height: 100% }</style>
+    <style>canvas { width: 100%; height: 100% }
+    body {
+	margin: 0px;
+	overflow: hidden;
+}</style>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script src="three.min.js"></script>
 <script src="OrbitAndPan.js"></script>
@@ -9,6 +13,7 @@
 <script src="dat.gui.min.js"></script>
 <script src="KeyboardState.js"></script>
 </head>
+
 <body>
 <div id="container">
     <canvas></canvas>
@@ -44,6 +49,10 @@ function fillScene() {
 	scene.add(light);
 	scene.add(light2);
 
+	var light = new THREE.PointLight(0xffffff);
+	light.position.set(0,250,0);
+	scene.add(light);
+
 
 	var urls = [
 	'sbox_px.jpg',
@@ -69,7 +78,7 @@ function fillScene() {
 	});
 
 	var skybox = new THREE.Mesh(
-		new THREE.CubeGeometry(2000,2000,2000),
+		new THREE.CubeGeometry(5000,5000,5000, 1, 1, 1),
 		skyBoxMaterial
 
 	);
@@ -78,18 +87,24 @@ function fillScene() {
 
 	// flygplan
 	var petalMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
-	var flygplanHeight = 200;
-	var petalLength = 200;
-	var cylGeom = new THREE.CylinderGeometry( 15, 0, petalLength, 32 );
+	var flygplanHeight = 100;
+	var petalLength = 100;
+	var cylGeom = new THREE.CylinderGeometry( 7.5, 0, petalLength, 16);
 
-	/////////
-	// YOUR CODE HERE
-	// add code here to make 24 petals, radiating around the sphere
-	// Just rotates and positions on the cylinder and petals are needed.
-	var geometry = new THREE.BoxGeometry(100,30,10);
+	// Floor
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'alexsu.jpg' );
+	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side:THREE.BackSide } );
+	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y = -0.5;
+	floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
+
+
+	var geometry = new THREE.BoxGeometry(50,15,5);
 	var material = new THREE.MeshBasicMaterial( {color: 0x00ff00});
 	var cube = new THREE.Mesh(geometry, material);
-	cube.position.y = 40
+	cube.position.y = 20
 	scene.add(cube);
 
 	var cylinder = new THREE.Mesh( cylGeom, petalMaterial );
@@ -101,8 +116,11 @@ function fillScene() {
 
 	flygplan.position.y = 150;
 	flygplan.position.x = 130;
-	flygplan.rotation.x = 1.56;
+	flygplan.rotation.z = 180*Math.PI/180
+	flygplan.rotation.x = 90*Math.PI/180;
 	scene.add( flygplan );
+
+
 
 
 
@@ -118,18 +136,18 @@ function init() {
 	var canvasRatio = canvasWidth / canvasHeight;
 
 	// RENDERER
-	renderer = new THREE.WebGLRenderer( { antialias: false } );
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
 	renderer.gammaInput = true;
 	renderer.gammaOutput = true;
 	renderer.setSize(canvasWidth, canvasHeight);
 	renderer.setClearColorHex( 0xAAAAAA, 1.0 );
 
 	// CAMERA
-	camera = new THREE.PerspectiveCamera( 38, canvasRatio, 1, 10000 );
+	camera = new THREE.PerspectiveCamera( 40, canvasRatio, 1, 10000 );
 	// CONTROLS
 	cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement);
-	camera.position.set(-200, 400, 20);
-	cameraControls.target.set(0,150,0);
+	camera.position.set(0, 2600, -700);
+	// cameraControls.target.set(180,-2000,180);
 	fillScene();
 
 }
