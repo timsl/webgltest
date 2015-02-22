@@ -82,6 +82,10 @@ function fillScene() {
 	var petalLength = 200;
 	var cylGeom = new THREE.CylinderGeometry( 15, 0, petalLength, 32 );
 
+	/////////
+	// YOUR CODE HERE
+	// add code here to make 24 petals, radiating around the sphere
+	// Just rotates and positions on the cylinder and petals are needed.
 	var geometry = new THREE.BoxGeometry(100,30,10);
 	var material = new THREE.MeshBasicMaterial( {color: 0x00ff00});
 	var cube = new THREE.Mesh(geometry, material);
@@ -106,10 +110,11 @@ function fillScene() {
 
 
 function init() {
-	var canvasWidth = window.innerWidth;
-	var canvasHeight = window.innerHeight;
-
-
+	var canvasWidth = 1920;
+	var canvasHeight = 1080;
+	// For grading the window is fixed in size; here's general code:
+	//var canvasWidth = window.innerWidth;
+	//var canvasHeight = window.innerHeight;
 	var canvasRatio = canvasWidth / canvasHeight;
 
 	// RENDERER
