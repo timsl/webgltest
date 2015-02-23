@@ -30,6 +30,8 @@ var ground = false;
 var keyboard = new KeyboardState();
 var flygplan = new THREE.Object3D();
 var cameralight;
+var light = new THREE.DirectionalLight(0xf6d87d, 1);
+var cubeb;
 
 function fillScene() {
 
@@ -131,7 +133,6 @@ function fillScene() {
 	geo.applyMatrix(new THREE.Matrix4().makeTranslation( 0, .5, 0));
 	var material = new THREE.MeshPhongMaterial({map: floorTexture, overdraw: true, color: 0xd7d7d7});
 
-	var light = new THREE.DirectionalLight(0xf6d87d, 1);
 	light.position.set(2,6,4);
 	scene.add(light);
 
@@ -145,6 +146,12 @@ function fillScene() {
 	light.shadowCameraLeft = -1200;
 	light.shadowCameraRight = 1200;
 	light.shadowCameraTop = 1200;
+
+	cubeb = new THREE.Mesh(geo.clone());
+	scene.add(cubeb)
+	cubeb.scale.x = 100;
+	cubeb.scale.y = 100;
+	cubeb.scale.z = 100;
 	light.shadowCameraBottom = -1200;
 
 
@@ -237,6 +244,16 @@ function update() {
 
 	var moveDistance = 500 * clock.getDelta();
 
+
+	var x = light.position.x;
+	var z = light.position.z;
+
+	// light.translateX(-moveDistance/50);
+	var theta = .001;
+	light.position.x = x * Math.cos(theta) + z * Math.sin(theta);
+	light.position.z = z * Math.cos(theta) - x * Math.sin(theta);
+	light.lookAt(0,0,0);
+
 	if(keyboard.pressed("A") )
 		flygplan.translateX(-moveDistance);
 	if(keyboard.pressed("D"))
@@ -266,6 +283,7 @@ function render() {
 	}
 
 	// cameralight.position.copy(camera.position);
+	cubeb.position.copy(light.position);
 
 	renderer.render(scene, camera);
 }
