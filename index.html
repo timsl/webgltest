@@ -29,6 +29,7 @@ var axes = false;
 var ground = false;
 var keyboard = new KeyboardState();
 var flygplan = new THREE.Object3D();
+var cameralight;
 
 function fillScene() {
 
@@ -37,21 +38,22 @@ function fillScene() {
 	scene = new THREE.Scene();
 
 	// LIGHTS
-	var ambientLight = new THREE.AmbientLight( 0x222222 );
 
-	var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-	light.position.set( 200, 400, 500 );
+	// var light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+	// light.position.set( 200, 400, 500 );
 
-	var light2 = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-	light2.position.set( -500, 250, -200 );
+	// var light2 = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
+	// light2.position.set( -500, 250, -200 );
 
-	scene.add(ambientLight);
-	scene.add(light);
-	scene.add(light2);
+	// scene.add(light);
+	// scene.add(light2);
 
-	var light = new THREE.PointLight(0xffffff);
-	light.position.set(0,250,0);
-	scene.add(light);
+	// var light = new THREE.PointLight(0xffffff);
+	// light.position.set(0,250,0);
+	// scene.add(light);
+
+	// cameralight = new THREE.PointLight(0xFFFFFF, 1.0);
+	// scene.add(cameralight);
 
 
 	var urls = [
@@ -86,23 +88,23 @@ function fillScene() {
 	scene.add(skybox);
 
 	// flygplan
-	var petalMaterial = new THREE.MeshLambertMaterial( { color: 0x000000 } );
+	var petalMaterial = new THREE.MeshPhongMaterial( { color: 0x000000 } );
 	var flygplanHeight = 100;
 	var petalLength = 100;
 	var cylGeom = new THREE.CylinderGeometry( 7.5, 0, petalLength, 16);
 
 	// Floor
 	var floorTexture = new THREE.ImageUtils.loadTexture( 'alexsu.jpg' );
-	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side:THREE.BackSide } );
-	var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+	var floorMaterial = new THREE.MeshBasicMaterial( { color: 0x999999, overdraw: true } );
+	var floorGeometry = new THREE.PlaneGeometry(2000, 2000, 20, 20);
 	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-	floor.position.y = -0.5;
-	floor.rotation.x = Math.PI / 2;
+	// floor.position.y = -0.5;
+	floor.rotation.x = -90 * Math.PI/180;
 	scene.add(floor);
 
 
 	var geometry = new THREE.BoxGeometry(50,15,5);
-	var material = new THREE.MeshBasicMaterial( {color: 0x00ff00});
+	var material = new THREE.MeshPhongMaterial( {color: 0x00ff00});
 	var cube = new THREE.Mesh(geometry, material);
 	cube.position.y = 20
 	scene.add(cube);
@@ -122,6 +124,49 @@ function fillScene() {
 
 
 
+	// Procedural generation of a town
+
+	// Cube & Material used to represent a house
+	var geo = new THREE.CubeGeometry(1,1,1);
+	geo.applyMatrix(new THREE.Matrix4().makeTranslation( 0, .5, 0));
+	var material = new THREE.MeshPhongMaterial({map: floorTexture, overdraw: true, color: 0xd7d7d7});
+
+	var light = new THREE.DirectionalLight(0xf6d87d, 1);
+	light.position.set(2,6,4);
+	scene.add(light);
+
+	light.castShadow = true;
+	light.shadowDarkness = 0.3;
+	light.shadowMapWidth = 2000;
+	light.shadowMapHeight = 2000;
+	light.position.set(600, 1400, 800);
+	light.shadowCameraFar = 2400;
+
+	light.shadowCameraLeft = -1200;
+	light.shadowCameraRight = 1200;
+	light.shadowCameraTop = 1200;
+	light.shadowCameraBottom = -1200;
+
+
+
+	var townGeo = new THREE.Geometry();
+	for(var i = 0; i < 300; i++) {
+		var house = new THREE.Mesh(geo.clone());
+		house.position.x = Math.floor(Math.random()*400-200) * 4;
+		house.position.z = Math.floor(Math.random()*400-200) * 4;
+		house.scale.x = Math.random() * 80 + 14;
+		house.scale.y = Math.random() * house.scale.x * 8 + 9;
+		house.scale.z = house.scale.x + 2;
+		THREE.GeometryUtils.merge(townGeo, house);
+	}	
+	var town = new THREE.Mesh(townGeo, material);
+	scene.add(town);
+
+	scene.fog = new THREE.FogExp2(0x9cb4b5, 0, 750);
+
+	floor.receiveShadow = true;
+	town.castShadow = true;
+	town.receiveShadow = true;
 
 
 }
@@ -140,7 +185,9 @@ function init() {
 	renderer.gammaInput = true;
 	renderer.gammaOutput = true;
 	renderer.setSize(canvasWidth, canvasHeight);
-	renderer.setClearColorHex( 0xAAAAAA, 1.0 );
+	// renderer.setClearColorHex( 0xAAAAAA, 1.0 );
+
+	renderer.shadowMapEnabled = true;
 
 	// CAMERA
 	camera = new THREE.PerspectiveCamera( 40, canvasRatio, 1, 10000 );
@@ -217,6 +264,8 @@ function render() {
 		fillScene();
 		drawHelpers();
 	}
+
+	// cameralight.position.copy(camera.position);
 
 	renderer.render(scene, camera);
 }
